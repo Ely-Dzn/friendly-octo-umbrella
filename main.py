@@ -10,7 +10,7 @@ class Main:
             file_name += ".241"
         return os.path.abspath(file_name)
 
-    def read_file(self):
+    def readInputfile(self):
         try:
             with open(self.file_path, 'r') as file:
                 return file.read().upper() 
