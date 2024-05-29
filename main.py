@@ -3,9 +3,9 @@ import sys
 
 class Main:
     def __init__(self, file_name):
-        self.file_path = self.get_full_path(file_name)
+        self.file_path = self.validateFile(file_name)
 
-    def get_full_path(self, file_name):
+    def validateFile(self, file_name):
         if not file_name.endswith(".241"):
             file_name += ".241"
         return os.path.abspath(file_name)
@@ -15,10 +15,10 @@ class Main:
             with open(self.file_path, 'r') as file:
                 return file.read().upper() 
         except FileNotFoundError:
-            print(f"Arquivo {self.file_path} não encontrado.")
+            print(f"arquivo {self.file_path} não encontrado.")
             return ""
         except IOError:
-            print(f"Erro ao ler o arquivo {self.file_path}.")
+            print(f"erro ao ler o arquivo {self.file_path}.")
             return ""
 
 
