@@ -1,5 +1,6 @@
 import os
 import sys
+from lexico import Lexer, Token
 
 class Main:
     def __init__(self, file_name):
@@ -21,6 +22,15 @@ class Main:
             print(f"erro ao ler o arquivo {self.file_path}.")
             return ""
 
+    def run(self):
+        input_data = self.readInputfile()
+        if input_data:
+            lexer = Lexer(input_data)
+            tokens = lexer.tokenize()
+            for token in tokens:
+                print(token)
+        else:
+            print(f"Não foi possível ler o arquivo {self.file_path}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
