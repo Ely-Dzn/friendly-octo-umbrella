@@ -1,6 +1,6 @@
 import os
 import sys
-from lexico import Lexer, Token
+from lexico import Lexer
 
 class Main:
     def __init__(self, file_name):
@@ -11,24 +11,24 @@ class Main:
             file_name += ".241"
         return os.path.abspath(file_name)
 
-    def readInputfile(self):
+    def readInputFile(self):
         try:
             with open(self.file_path, 'r') as file:
-                return file.read().upper() 
+                return file.read().upper()  # Lê o conteúdo do arquivo e converte para maiúsculas
         except FileNotFoundError:
-            print(f"arquivo {self.file_path} não encontrado.")
+            print(f"Arquivo {self.file_path} não encontrado.")
             return ""
         except IOError:
-            print(f"erro ao ler o arquivo {self.file_path}.")
+            print(f"Erro ao ler o arquivo {self.file_path}.")
             return ""
 
     def run(self):
-        input_data = self.readInputfile()
+        input_data = self.readInputFile()
         if input_data:
             lexer = Lexer(input_data)
             tokens = lexer.tokenize()
-            for token in tokens:
-                print(token)
+            report = lexer.generate_report()
+            print(report)
         else:
             print(f"Não foi possível ler o arquivo {self.file_path}")
 
