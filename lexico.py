@@ -20,7 +20,7 @@ class SymbolTable:
     def add_symbol(self, lexeme, symbol_type, line_number):
         if lexeme not in self.symbols:
             truncated_lexeme = lexeme[:30]
-            atom_code = ATOM_CODES.get(symbol_type, "UNKN")
+            atom_code = ATOM_CODES.get(lexeme.lower(), "UNKN")
             self.symbols[lexeme] = {
                 'index': self.counter,
                 'atom_code': atom_code,
@@ -37,7 +37,6 @@ class SymbolTable:
                 if len(self.symbols[lexeme]['lines']) > 5:
                     self.symbols[lexeme]['lines'].pop(0)
 
-
 class Token:
     def __init__(self, token_type, value):
         self.type = token_type
@@ -47,16 +46,13 @@ class Token:
 
 class Lexer:
     RESERVED_WORDS = {
-        "cadeia": "A01", "caracter": "A02", "declaracoes": "A03", "enquanto": "A04", "false": "A05", 
-        "fimDeclaracoes": "A06", "fimEnquanto": "A07", "fimFunc": "A08", "fimFuncoes": "A09", 
-        "fimPrograma": "A10", "fimSe": "A11", "funcoes": "A12", "imprime": "A13", "inteiro": "A14", 
-        "logico": "A15", "pausa": "A16", "programa": "A17", "real": "A18", "retorna": "A19", "se": "A20", 
-        "senao": "A21", "tipofunc": "A22", "tipoParam": "A23", "tipoVar": "A24", "true": "A25", "vazio": "A26",
-        "%": "B01", "(": "B02", ")": "B03", ",": "B04", ":": "B05", ":=": "B06", ";": "B07", "?": "B08", 
-        "[": "B09", "]": "B10", "{": "B11", "}": "B12", "-": "B13", "*": "B14", "/": "B15","+": "B16", "!=": "B17", 
-        "#": "B18", "<": "B19", "<=": "B20", "==": "B21", ">": "B22", ">=": "B23", "consCadeia": "C01", "consCaractere": "C02", 
-        "ConsInteiro": "C03", "ConsReal": "C04", "nomFuncao": "C05", "nomPrograma": "C06", "variavel": "C07"
+        "cadeia": "A01", "caracter": "A02", "declaracoes": "A03", "enquanto": "A04", "false": "A05",
+        "fimDeclaracoes": "A06", "fimEnquanto": "A07", "fimFunc": "A08", "fimFuncoes": "A09",
+        "fimPrograma": "A10", "fimSe": "A11", "funcoes": "A12", "imprime": "A13", "inteiro": "A14",
+        "logico": "A15", "pausa": "A16", "programa": "A17", "real": "A18", "retorna": "A19", "se": "A20",
+        "senao": "A21", "tipofunc": "A22", "tipoParam": "A23", "tipoVar": "A24", "true": "A25", "vazio": "A26"
     }
+
     def __init__(self, input_data):
         self.input_data = input_data
         self.position = 0
@@ -107,20 +103,6 @@ class Lexer:
     def is_valid_char(self, char):
         return char.isalnum() or char in "_$\"'/*"
 
-    def filterInvalidChars(self):
-        self.input_data = ''.join(filter(self.is_valid_char, self.input_data))
-
-    def getTokenType(self, token_value):
-        if token_value.isdigit():
-            return 'NUMBER'
-        elif token_value.isidentifier():
-            if token_value.lower() in self.RESERVED_WORDS:
-                return self.RESERVED_WORDS[token_value.lower()]
-            else:
-                return 'IDENTIFIER'
-        else:
-            return 'UNKNOWN'
-
     def formToken(self):
         self.skipWhitespace()
         self.skipComment()
@@ -131,29 +113,24 @@ class Lexer:
             if len(token) >= 30:
                 break
         if token:
-            token_type = self.getTokenType(token)
+            token_type = 'UNKN'
+            if token.lower() in self.RESERVED_WORDS:
+                token_type = self.RESERVED_WORDS[token.lower()]
+            elif token.isidentifier():
+                token_type = 'IDENTIFIER'
             self.lexemes.append((token, start_position, self.position, self.line_number))
-            if token_type == 'IDENTIFIER':
-                if token.lower() in self.RESERVED_WORDS:
-                    token_type = self.RESERVED_WORDS[token.lower()]
-                else:
-                    token_type = 'UNKN'
-                self.symbol_table.add_symbol(token, token_type, self.line_number)
-        return token, token_type  
-
-    def bufferInput(self):
-        self.buffer = list(self.input_data)
+            self.symbol_table.add_symbol(token, token_type, self.line_number)
+        return token, token_type
 
     def tokenize(self):
         tokens = []
         while self.current_char is not None:
-            token_value, token_type = self.formToken()  # Desempacotando a tupla retornada
+            token_value, token_type = self.formToken()
             if token_value:
                 tokens.append(Token(token_type, token_value))
         return tokens
-    
+
     def generate_report(self):
-        tokens = self.tokenize()  # Tokenizar o input antes de gerar o relatório
         report = f"Código da Equipe: 06\n"
         report += f"Componentes:\n"
         report += f"João Marcelo Costa Miranda; joao.miranda@aln.senaicimatec.edu.br; (71)99286-9762\n"
@@ -161,7 +138,7 @@ class Lexer:
         report += f"Henrique Malisano; henrique.malisano@aln.senaicimatec.edu.br; (71)99693-2526\n"
         report += f"Eric Lisboa Queiroz; eric.queiroz@aln.senaicimatec.edu.br; (71)99600-1889\n\n"
         report += f"RELATÓRIO DA ANÁLISE LÉXICA. Texto fonte analisado: Teste.241\n"
-        
+
         for lexeme_info in self.lexemes:
             lexeme, start_position, end_position, line_number = lexeme_info
             symbol_info = self.symbol_table.symbols.get(lexeme, {})
