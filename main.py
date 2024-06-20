@@ -29,6 +29,8 @@ class Main:
             tokens = lexer.tokenize()
             report_file_name = os.path.splitext(self.file_path)[0] + ".lex"
             lexer.generate_report(report_file_name, os.path.basename(self.file_path))
+            symbol_table_report_file_name = os.path.splitext(self.file_path)[0] + ".tab"
+            lexer.generate_symbol_table_report(symbol_table_report_file_name, os.path.basename(self.file_path))
         else:
             print(f"Não foi possível ler o arquivo {self.file_path}")
 

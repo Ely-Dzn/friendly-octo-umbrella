@@ -137,4 +137,21 @@ class Lexer:
                 symbol_info = self.symbol_table.symbols.get(lexeme, {})
                 atom_code = symbol_info.get('atom_code', 'UNKNOWN')
                 file.write(f"Lexeme: {lexeme}, Código: {atom_code}, ÍndiceTabSimb: {symbol_info.get('index', 'UNKNOWN')}, Linha: {', '.join(map(str, symbol_info.get('lines', [])))}\n")
-
+    
+    def generate_symbol_table_report(self, report_file_name, input_file_name):
+        with open(report_file_name, 'w') as file:
+            file.write("Código da Equipe: 06\n")
+            file.write("Componentes:\n")
+            file.write("João Marcelo Costa Miranda; joao.miranda@aln.senaicimatec.edu.br; (71)99286-9762\n")
+            file.write("Gabriel de Brito Leal dos Santos; gabriel2@aln.senaicimatec.edu.br; (71)99244-7371\n")
+            file.write("Henrique Malisano; henrique.malisano@aln.senaicimatec.edu.br; (71)99693-2526\n")
+            file.write("Eric Lisboa Queiroz; eric.queiroz@aln.senaicimatec.edu.br; (71)99600-1889\n\n")
+            file.write(f"RELATÓRIO DA TABELA DE SÍMBOLOS. Texto fonte analisado: {input_file_name}\n")
+        
+            for lexeme, symbol_info in self.symbol_table.symbols.items():
+                atom_code = symbol_info.get('atom_code', 'UNKNOWN')
+                original_length = symbol_info.get('original_length', 'UNKNOWN')
+                truncated_length = symbol_info.get('truncated_length', 'UNKNOWN')
+                symbol_type = symbol_info.get('symbol_type', 'UNKNOWN')
+                lines = symbol_info.get('lines', [])
+                file.write(f"Entrada: {symbol_info['index']}, Codigo: {atom_code}, Lexeme: {lexeme}, QtdCharAntesTrunc: {original_length}, QtdCharDepoisTrunc: {truncated_length}, TipoSimb: {symbol_type}, Linhas: {{{', '.join(map(str, lines))}}}\n")
