@@ -130,21 +130,20 @@ class Lexer:
                 tokens.append(Token(token_type, token_value))
         return tokens
 
-    def generate_report(self):
-        report = f"Código da Equipe: 06\n"
-        report += f"Componentes:\n"
-        report += f"João Marcelo Costa Miranda; joao.miranda@aln.senaicimatec.edu.br; (71)99286-9762\n"
-        report += f"Gabriel de Brito Leal dos Santos; gabriel2@aln.senaicimatec.edu.br; (71)99244-7371\n"
-        report += f"Henrique Malisano; henrique.malisano@aln.senaicimatec.edu.br; (71)99693-2526\n"
-        report += f"Eric Lisboa Queiroz; eric.queiroz@aln.senaicimatec.edu.br; (71)99600-1889\n\n"
-        report += f"RELATÓRIO DA ANÁLISE LÉXICA. Texto fonte analisado: Teste.241\n"
-
-        for lexeme_info in self.lexemes:
-            lexeme, start_position, end_position, line_number = lexeme_info
-            symbol_info = self.symbol_table.symbols.get(lexeme, {})
-            atom_code = symbol_info.get('atom_code', 'UNKNOWN')
-            index = symbol_info.get('index', 'UNKNOWN')
-            lines = ', '.join(map(str, symbol_info.get('lines', [])))
-            report += f"Lexeme: {lexeme}, Código: {atom_code}, ÍndiceTabSimb: {index}, Linhas: {lines}\n"
-
-        return report
+    def generate_report(self, filename="teste.lex"):
+        tokens = self.tokenize()
+        with open(filename, 'w') as file:
+            file.write(f"Código da Equipe: 06\n")
+            file.write(f"Componentes:\n")
+            file.write(f"João Marcelo Costa Miranda; joao.miranda@aln.senaicimatec.edu.br; (71)99286-9762\n")
+            file.write(f"Gabriel de Brito Leal dos Santos; gabriel2@aln.senaicimatec.edu.br; (71)99244-7371\n")
+            file.write(f"Henrique Malisano; henrique.malisano@aln.senaicimatec.edu.br; (71)99693-2526\n")
+            file.write(f"Eric Lisboa Queiroz; eric.queiroz@aln.senaicimatec.edu.br; (71)99600-1889\n\n")
+            file.write(f"RELATÓRIO DA ANÁLISE LÉXICA. Texto fonte analisado: Teste.241\n")
+            for lexeme_info in self.lexemes:
+                lexeme, start_position, end_position, line_number = lexeme_info
+                symbol_info = self.symbol_table.symbols.get(lexeme, {})
+                atom_code = symbol_info.get('atom_code', 'UNKNOWN')
+                index = symbol_info.get('index', 'UNKNOWN')
+                lines = ', '.join(map(str, symbol_info.get('lines', [])))
+                file.write(f"Lexeme: {lexeme}, Código: {atom_code}, ÍndiceTabSimb: {index}, Linhas: {lines}\n")
