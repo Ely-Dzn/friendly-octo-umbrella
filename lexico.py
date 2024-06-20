@@ -130,20 +130,19 @@ class Lexer:
                 tokens.append(Token(token_type, token_value))
         return tokens
 
-    def generate_report(self, filename="teste.lex"):
-        tokens = self.tokenize()
-        with open(filename, 'w') as file:
-            file.write(f"Código da Equipe: 06\n")
-            file.write(f"Componentes:\n")
-            file.write(f"João Marcelo Costa Miranda; joao.miranda@aln.senaicimatec.edu.br; (71)99286-9762\n")
-            file.write(f"Gabriel de Brito Leal dos Santos; gabriel2@aln.senaicimatec.edu.br; (71)99244-7371\n")
-            file.write(f"Henrique Malisano; henrique.malisano@aln.senaicimatec.edu.br; (71)99693-2526\n")
-            file.write(f"Eric Lisboa Queiroz; eric.queiroz@aln.senaicimatec.edu.br; (71)99600-1889\n\n")
-            file.write(f"RELATÓRIO DA ANÁLISE LÉXICA. Texto fonte analisado: Teste.241\n")
+    
+    def generate_report(self, report_file_name, input_file_name):
+        with open(report_file_name, 'w') as file:
+            file.write("Código da Equipe: 06\n")
+            file.write("Componentes:\n")
+            file.write("João Marcelo Costa Miranda; joao.miranda@aln.senaicimatec.edu.br; (71)99286-9762\n")
+            file.write("Gabriel de Brito Leal dos Santos; gabriel2@aln.senaicimatec.edu.br; (71)99244-7371\n")
+            file.write("Henrique Malisano; henrique.malisano@aln.senaicimatec.edu.br; (71)99693-2526\n")
+            file.write("Eric Lisboa Queiroz; eric.queiroz@aln.senaicimatec.edu.br; (71)99600-1889\n\n")
+            file.write(f"RELATÓRIO DA ANÁLISE LÉXICA. Texto fonte analisado: {input_file_name}\n")
+            
             for lexeme_info in self.lexemes:
                 lexeme, start_position, end_position, line_number = lexeme_info
                 symbol_info = self.symbol_table.symbols.get(lexeme, {})
                 atom_code = symbol_info.get('atom_code', 'UNKNOWN')
-                index = symbol_info.get('index', 'UNKNOWN')
-                lines = ', '.join(map(str, symbol_info.get('lines', [])))
-                file.write(f"Lexeme: {lexeme}, Código: {atom_code}, ÍndiceTabSimb: {index}, Linhas: {lines}\n")
+                file.write(f"Lexeme: {lexeme}, Código: {atom_code}, ÍndiceTabSimb: {symbol_info.get('index', 'UNKNOWN')}, Linha: {', '.join(map(str, symbol_info.get('lines', [])))}\n")

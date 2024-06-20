@@ -27,7 +27,8 @@ class Main:
         if input_data:
             lexer = Lexer(input_data)
             tokens = lexer.tokenize()
-            lexer.generate_report("teste.lex")
+            report_file_name = os.path.splitext(self.file_path)[0] + ".lex"
+            lexer.generate_report(report_file_name, os.path.basename(self.file_path))
         else:
             print(f"Não foi possível ler o arquivo {self.file_path}")
 
