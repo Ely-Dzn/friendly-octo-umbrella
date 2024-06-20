@@ -1,6 +1,7 @@
 import re
 
-ATOM_CODES = {
+# Tabela de Palavras e Símbolos Reservados
+RESERVED_WORDS = {
     "cadeia": "A01", "caracter": "A02", "declaracoes": "A03", "enquanto": "A04", "false": "A05", 
     "fimDeclaracoes": "A06", "fimEnquanto": "A07", "fimFunc": "A08", "fimFuncoes": "A09", 
     "fimPrograma": "A10", "fimSe": "A11", "funcoes": "A12", "imprime": "A13", "inteiro": "A14", 
@@ -8,10 +9,11 @@ ATOM_CODES = {
     "senao": "A21", "tipofunc": "A22", "tipoParam": "A23", "tipoVar": "A24", "true": "A25", "vazio": "A26",
     "%": "B01", "(": "B02", ")": "B03", ",": "B04", ":": "B05", ":=": "B06", ";": "B07", "?": "B08", 
     "[": "B09", "]": "B10", "{": "B11", "}": "B12", "-": "B13", "*": "B14", "/": "B15","+": "B16", "!=": "B17", 
-    "#": "B18", "<": "B19", "<=": "B20", "==" : "B21", ">": "B22", ">=": "B23", "consCadeia": "C01", "consCaractere": "C02", 
+    "#": "B18", "<": "B19", "<=": "B20", "==": "B21", ">": "B22", ">=": "B23", "consCadeia": "C01", "consCaractere": "C02", 
     "ConsInteiro": "C03", "ConsReal": "C04", "nomFuncao": "C05", "nomPrograma": "C06", "variavel": "C07"
 }
 
+# Tabela de Símbolos
 class SymbolTable:
     def __init__(self):
         self.symbols = {}
@@ -20,7 +22,7 @@ class SymbolTable:
     def add_symbol(self, lexeme, symbol_type, line_number):
         if lexeme not in self.symbols:
             truncated_lexeme = lexeme[:30]
-            atom_code = ATOM_CODES.get(lexeme.lower(), "UNKN")
+            atom_code = RESERVED_WORDS.get(lexeme.lower(), "UNKN")
             self.symbols[lexeme] = {
                 'index': self.counter,
                 'atom_code': atom_code,
@@ -42,17 +44,7 @@ class Token:
         self.type = token_type
         self.value = value
 
-    
-
 class Lexer:
-    RESERVED_WORDS = {
-        "cadeia": "A01", "caracter": "A02", "declaracoes": "A03", "enquanto": "A04", "false": "A05",
-        "fimDeclaracoes": "A06", "fimEnquanto": "A07", "fimFunc": "A08", "fimFuncoes": "A09",
-        "fimPrograma": "A10", "fimSe": "A11", "funcoes": "A12", "imprime": "A13", "inteiro": "A14",
-        "logico": "A15", "pausa": "A16", "programa": "A17", "real": "A18", "retorna": "A19", "se": "A20",
-        "senao": "A21", "tipofunc": "A22", "tipoParam": "A23", "tipoVar": "A24", "true": "A25", "vazio": "A26"
-    }
-
     def __init__(self, input_data):
         self.input_data = input_data
         self.position = 0
@@ -114,8 +106,8 @@ class Lexer:
                 break
         if token:
             token_type = 'UNKN'
-            if token.lower() in self.RESERVED_WORDS:
-                token_type = self.RESERVED_WORDS[token.lower()]
+            if token.lower() in RESERVED_WORDS:
+                token_type = RESERVED_WORDS[token.lower()]
             elif token.isidentifier():
                 token_type = 'IDENTIFIER'
             self.lexemes.append((token, start_position, self.position, self.line_number))
@@ -130,7 +122,6 @@ class Lexer:
                 tokens.append(Token(token_type, token_value))
         return tokens
 
-    
     def generate_report(self, report_file_name, input_file_name):
         with open(report_file_name, 'w') as file:
             file.write("Código da Equipe: 06\n")
@@ -146,3 +137,4 @@ class Lexer:
                 symbol_info = self.symbol_table.symbols.get(lexeme, {})
                 atom_code = symbol_info.get('atom_code', 'UNKNOWN')
                 file.write(f"Lexeme: {lexeme}, Código: {atom_code}, ÍndiceTabSimb: {symbol_info.get('index', 'UNKNOWN')}, Linha: {', '.join(map(str, symbol_info.get('lines', [])))}\n")
+
