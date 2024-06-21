@@ -96,57 +96,59 @@ class Lexer:
         return char.isalnum() or char in "_$\"'/*"
 
     def formToken(self):
-        self.skipWhitespace()
-        self.skipComment()
-        token = ''
-        start_position = self.position
-        while self.current_char is not None and self.is_valid_char(self.current_char):
-            token += self.readChar()
-            if len(token) >= 30:
-                break
-        if token:
-            token_type = 'UNKN'
-            if token.lower() in RESERVED_WORDS:
-                token_type = RESERVED_WORDS[token.lower()]
-            elif token.isidentifier():
-                token_type = 'IDENTIFIER'
-            self.lexemes.append((token, start_position, self.position, self.line_number))
-            self.symbol_table.add_symbol(token, token_type, self.line_number)
-        return token, token_type
+            self.skipWhitespace()
+            self.skipComment()
+            token = ''
+            start_position = self.position
+            token_type = 'UNKN'  # Inicializa token_type como 'UNKN'
+            while self.current_char is not None and self.is_valid_char(self.current_char):
+                token += self.readChar()
+                if len(token) >= 30:
+                    break
+            if token:
+                if token.lower() in RESERVED_WORDS:
+                    token_type = RESERVED_WORDS[token.lower()]
+                elif token.isidentifier():
+                    token_type = 'IDENTIFIER'
+                self.lexemes.append((token, start_position, self.position, self.line_number))
+                self.symbol_table.add_symbol(token, token_type, self.line_number)
+            return token, token_type
 
     def tokenize(self):
         tokens = []
         while self.current_char is not None:
             token_value, token_type = self.formToken()
-            if token_value:
+            if token_value:  # Certifica-se de que um token foi formado
                 tokens.append(Token(token_type, token_value))
+            else:
+                self.advance()  # Avança para evitar loops infinitos
         return tokens
 
     def generate_report(self, report_file_name, input_file_name):
         with open(report_file_name, 'w') as file:
-            file.write("Código da Equipe: 06\n")
+            file.write("Codigo da Equipe: 06\n")
             file.write("Componentes:\n")
-            file.write("João Marcelo Costa Miranda; joao.miranda@aln.senaicimatec.edu.br; (71)99286-9762\n")
+            file.write("Joao Marcelo Costa Miranda; joao.miranda@aln.senaicimatec.edu.br; (71)99286-9762\n")
             file.write("Gabriel de Brito Leal dos Santos; gabriel2@aln.senaicimatec.edu.br; (71)99244-7371\n")
             file.write("Henrique Malisano; henrique.malisano@aln.senaicimatec.edu.br; (71)99693-2526\n")
             file.write("Eric Lisboa Queiroz; eric.queiroz@aln.senaicimatec.edu.br; (71)99600-1889\n\n")
-            file.write(f"RELATÓRIO DA ANÁLISE LÉXICA. Texto fonte analisado: {input_file_name}\n")
+            file.write(f"RELATORIO DA ANALISE LEXICA. Texto fonte analisado: {input_file_name}\n")
             
             for lexeme_info in self.lexemes:
                 lexeme, start_position, end_position, line_number = lexeme_info
                 symbol_info = self.symbol_table.symbols.get(lexeme, {})
                 atom_code = symbol_info.get('atom_code', 'UNKNOWN')
                 file.write(f"Lexeme: {lexeme}, Código: {atom_code}, ÍndiceTabSimb: {symbol_info.get('index', 'UNKNOWN')}, Linha: {', '.join(map(str, symbol_info.get('lines', [])))}\n")
-    
+
     def generate_symbol_table_report(self, report_file_name, input_file_name):
         with open(report_file_name, 'w') as file:
-            file.write("Código da Equipe: 06\n")
+            file.write("Codigo da Equipe: 06\n")
             file.write("Componentes:\n")
-            file.write("João Marcelo Costa Miranda; joao.miranda@aln.senaicimatec.edu.br; (71)99286-9762\n")
+            file.write("Joao Marcelo Costa Miranda; joao.miranda@aln.senaicimatec.edu.br; (71)99286-9762\n")
             file.write("Gabriel de Brito Leal dos Santos; gabriel2@aln.senaicimatec.edu.br; (71)99244-7371\n")
             file.write("Henrique Malisano; henrique.malisano@aln.senaicimatec.edu.br; (71)99693-2526\n")
             file.write("Eric Lisboa Queiroz; eric.queiroz@aln.senaicimatec.edu.br; (71)99600-1889\n\n")
-            file.write(f"RELATÓRIO DA TABELA DE SÍMBOLOS. Texto fonte analisado: {input_file_name}\n")
+            file.write(f"RELATORIO DA TABELA DE SIMBOLOS. Texto fonte analisado: {input_file_name}\n")
         
             for lexeme, symbol_info in self.symbol_table.symbols.items():
                 atom_code = symbol_info.get('atom_code', 'UNKNOWN')
