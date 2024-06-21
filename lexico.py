@@ -1,17 +1,37 @@
 import re
-
-# Tabela de Palavras e Símbolos Reservados
 RESERVED_WORDS = {
-    "cadeia": "A01", "caracter": "A02", "declaracoes": "A03", "enquanto": "A04", "false": "A05", 
-    "fimDeclaracoes": "A06", "fimEnquanto": "A07", "fimFunc": "A08", "fimFuncoes": "A09", 
-    "fimPrograma": "A10", "fimSe": "A11", "funcoes": "A12", "imprime": "A13", "inteiro": "A14", 
-    "logico": "A15", "pausa": "A16", "programa": "A17", "real": "A18", "retorna": "A19", "se": "A20", 
-    "senao": "A21", "tipofunc": "A22", "tipoParam": "A23", "tipoVar": "A24", "true": "A25", "vazio": "A26",
-    "%": "B01", "(": "B02", ")": "B03", ",": "B04", ":": "B05", ":=": "B06", ";": "B07", "?": "B08", 
-    "[": "B09", "]": "B10", "{": "B11", "}": "B12", "-": "B13", "*": "B14", "/": "B15","+": "B16", "!=": "B17", 
-    "#": "B18", "<": "B19", "<=": "B20", "==": "B21", ">": "B22", ">=": "B23", "consCadeia": "C01", "consCaractere": "C02", 
-    "ConsInteiro": "C03", "ConsReal": "C04", "nomFuncao": "C05", "nomPrograma": "C06", "variavel": "C07"
-}
+        "cadeia": "A01", "caracter": "A02", "declaracoes": "A03", "enquanto": "A04", "false": "A05", 
+        "fimDeclaracoes": "A06", "fimEnquanto": "A07", "fimFunc": "A08", "fimFuncoes": "A09", 
+        "fimPrograma": "A10", "fimSe": "A11", "funcoes": "A12", "imprime": "A13", "inteiro": "A14", 
+        "logico": "A15", "pausa": "A16", "programa": "A17", "real": "A18", "retorna": "A19", "se": "A20", 
+        "senao": "A21", "tipofunc": "A22", "tipoParam": "A23", "tipoVar": "A24", "true": "A25", "vazio": "A26",
+        "%": "B01", "(": "B02", ")": "B03", ",": "B04", ":": "B05", ":=": "B06", ";": "B07", "?": "B08", 
+        "[": "B09", "]": "B10", "{": "B11", "}": "B12", "-": "B13", "*": "B14", "/": "B15","+": "B16", "!=": "B17", 
+        "#": "B18", "<": "B19", "<=": "B20", "==": "B21", ">": "B22", ">=": "B23", "consCadeia": "C01", "consCaractere": "C02", 
+        "consInteiro": "C03", "consReal": "C04", "nomFuncao": "C05", "nomPrograma": "C06", "variavel": "C07"
+    }
+
+def get_atom_code(lexeme):
+    if lexeme.lower() in RESERVED_WORDS:
+        return RESERVED_WORDS[lexeme.lower()]
+    
+    if lexeme.isdigit():
+        return "C03"  # consInteiro
+    
+    try:
+        float_value = float(lexeme)
+        if float_value.is_integer():
+            return "C03"  # consInteiro
+        else:
+            return "C04"  # consReal
+    except ValueError:
+        pass
+    
+    if lexeme.isidentifier() and lexeme.startswith("_"):
+        return "C07"  # variavel
+    
+    return "UNKN"  # Desconhecido ou não especificado
+
 
 # Tabela de Símbolos
 class SymbolTable:
@@ -19,10 +39,12 @@ class SymbolTable:
         self.symbols = {}
         self.counter = 1
 
+
     def add_symbol(self, lexeme, symbol_type, line_number):
         if lexeme not in self.symbols:
             truncated_lexeme = lexeme[:30]
-            atom_code = RESERVED_WORDS.get(lexeme.lower(), "UNKN")
+            atom_code = get_atom_code(lexeme)
+            
             self.symbols[lexeme] = {
                 'index': self.counter,
                 'atom_code': atom_code,
@@ -38,6 +60,8 @@ class SymbolTable:
                 self.symbols[lexeme]['lines'].append(line_number)
                 if len(self.symbols[lexeme]['lines']) > 5:
                     self.symbols[lexeme]['lines'].pop(0)
+
+
 
 class Token:
     def __init__(self, token_type, value):
@@ -102,16 +126,20 @@ class Lexer:
         start_position = self.position
         token_type = 'UNKN'  # Inicializa token_type como 'UNKN'
 
+        if self.current_char is None:
+            return token, token_type
+        
         if self.current_char.isdigit():
             while self.current_char is not None and (self.current_char.isdigit() or self.current_char == '.'):
                 token += self.readChar()
             token_type = 'NUMBER'
         elif self.current_char == '_':
+            token += self.readChar()
             while self.current_char is not None and self.current_char.isalnum():
                 token += self.readChar()
-            token_type = 'IDENTIFIER'
+            token_type = 'VARIABLE'
         elif self.current_char.isalpha():
-            while self.current_char is not None and self.current_char.isalnum():
+            while self.current_char is not None and self.is_valid_char(self.current_char):
                 token += self.readChar()
             if token.lower() in RESERVED_WORDS:
                 token_type = RESERVED_WORDS[token.lower()]
@@ -132,7 +160,7 @@ class Lexer:
             token_value, token_type = self.formToken()
             if token_value:  # Certifica-se de que um token foi formado
                 # Se encontrar a palavra-chave "PROGRAMA", o próximo nome válido será o nome do programa
-                if token_type == RESERVED_WORDS.get("PROGRAMA", ""):
+                if token_type == RESERVED_WORDS.get("programa", ""):
                     first_valid_name_found = True
                 elif first_valid_name_found and token_type == 'IDENTIFIER':
                     token_type = 'PROGRAM_NAME'
@@ -168,11 +196,16 @@ class Lexer:
             file.write("Henrique Malisano; henrique.malisano@aln.senaicimatec.edu.br; (71)99693-2526\n")
             file.write("Eric Lisboa Queiroz; eric.queiroz@aln.senaicimatec.edu.br; (71)99600-1889\n\n")
             file.write(f"RELATORIO DA TABELA DE SIMBOLOS. Texto fonte analisado: {input_file_name}\n")
-        
+
             for lexeme, symbol_info in self.symbol_table.symbols.items():
-                atom_code = symbol_info.get('atom_code', 'UNKNOWN')
-                original_length = symbol_info.get('original_length', 'UNKNOWN')
-                truncated_length = symbol_info.get('truncated_length', 'UNKNOWN')
-                symbol_type = symbol_info.get('symbol_type', 'UNKNOWN')
+                atom_code = symbol_info.get('atom_code', 'UNKN')
+                original_length = symbol_info.get('original_length', 'UNKN')
+                truncated_length = symbol_info.get('truncated_length', 'UNKN')
+                symbol_type = symbol_info.get('symbol_type', 'UNKN')
                 lines = symbol_info.get('lines', [])
+                
+                # Ajuste para considerar o tipo de símbolo corretamente
+                if atom_code != "UNKN":
+                    symbol_type = "Identificador"  # Se não for desconhecido, assume como Identificador
+                
                 file.write(f"Entrada: {symbol_info['index']}, Codigo: {atom_code}, Lexeme: {lexeme}, QtdCharAntesTrunc: {original_length}, QtdCharDepoisTrunc: {truncated_length}, TipoSimb: {symbol_type}, Linhas: {{{', '.join(map(str, lines))}}}\n")
