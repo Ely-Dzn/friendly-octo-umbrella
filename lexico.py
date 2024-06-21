@@ -96,29 +96,48 @@ class Lexer:
         return char.isalnum() or char in "_$\"'/*"
 
     def formToken(self):
-            self.skipWhitespace()
-            self.skipComment()
-            token = ''
-            start_position = self.position
-            token_type = 'UNKN'  # Inicializa token_type como 'UNKN'
-            while self.current_char is not None and self.is_valid_char(self.current_char):
+        self.skipWhitespace()
+        self.skipComment()
+        token = ''
+        start_position = self.position
+        token_type = 'UNKN'  # Inicializa token_type como 'UNKN'
+
+        if self.current_char.isdigit():
+            while self.current_char is not None and (self.current_char.isdigit() or self.current_char == '.'):
                 token += self.readChar()
-                if len(token) >= 30:
-                    break
-            if token:
-                if token.lower() in RESERVED_WORDS:
-                    token_type = RESERVED_WORDS[token.lower()]
-                elif token.isidentifier():
-                    token_type = 'IDENTIFIER'
-                self.lexemes.append((token, start_position, self.position, self.line_number))
-                self.symbol_table.add_symbol(token, token_type, self.line_number)
-            return token, token_type
+            token_type = 'NUMBER'
+        elif self.current_char == '_':
+            while self.current_char is not None and self.current_char.isalnum():
+                token += self.readChar()
+            token_type = 'IDENTIFIER'
+        elif self.current_char.isalpha():
+            while self.current_char is not None and self.current_char.isalnum():
+                token += self.readChar()
+            if token.lower() in RESERVED_WORDS:
+                token_type = RESERVED_WORDS[token.lower()]
+            else:
+                token_type = 'IDENTIFIER'
+        else:
+            token += self.readChar()
+
+        if token:
+            self.lexemes.append((token, start_position, self.position, self.line_number))
+            self.symbol_table.add_symbol(token, token_type, self.line_number)
+        return token, token_type
 
     def tokenize(self):
         tokens = []
+        first_valid_name_found = False
         while self.current_char is not None:
             token_value, token_type = self.formToken()
             if token_value:  # Certifica-se de que um token foi formado
+                # Se encontrar a palavra-chave "PROGRAMA", o próximo nome válido será o nome do programa
+                if token_type == RESERVED_WORDS.get("PROGRAMA", ""):
+                    first_valid_name_found = True
+                elif first_valid_name_found and token_type == 'IDENTIFIER':
+                    token_type = 'PROGRAM_NAME'
+                    first_valid_name_found = False
+
                 tokens.append(Token(token_type, token_value))
             else:
                 self.advance()  # Avança para evitar loops infinitos
