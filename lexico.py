@@ -138,7 +138,7 @@ class Lexer:
                 lexeme, start_position, end_position, line_number = lexeme_info
                 symbol_info = self.symbol_table.symbols.get(lexeme, {})
                 atom_code = symbol_info.get('atom_code', 'UNKNOWN')
-                file.write(f"Lexeme: {lexeme}, Código: {atom_code}, ÍndiceTabSimb: {symbol_info.get('index', 'UNKNOWN')}, Linha: {', '.join(map(str, symbol_info.get('lines', [])))}\n")
+                file.write(f"Lexeme: {lexeme}, Codigo: {atom_code}, IndiceTabSimb: {symbol_info.get('index', 'UNKNOWN')}, Linha: {', '.join(map(str, symbol_info.get('lines', [])))}\n")
 
     def generate_symbol_table_report(self, report_file_name, input_file_name):
         with open(report_file_name, 'w') as file:
