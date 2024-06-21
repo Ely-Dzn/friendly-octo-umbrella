@@ -1,0 +1,35 @@
+programa 4_azul 3Ex3mplo // Teste de escopo + inicial de variavel
+
+declaracoes
+    inteiro a, b, resultado;
+    cadeia mensagemgrandeosuficientecommaisde30chars; // teste truncagem de 30 caracteres de variavel
+fimDeclaracoes
+
+funcoes_= // "=" caracter fora da linguagem para teste de filtragem e _ para teste de escopo
+    tipoFuncao vazio exemplo_Funcao exp (cadeia parametro) { // Teste _ sendo variavel
+        imprime("Executando a funcao exemploFuncao");
+        // Comentario de linha teste
+        a := 12345.678901234567890123456789012345;
+        b := 20;
+        se a > b
+            resultado := a;
+        senao
+            resultado := b;
+        fimSe
+        retorna;
+    }
+fimfuncoes
+
+enquanto a <= b
+    // Loop exemplo
+    a := a + 1;
+    b := b - 1;
+    imprime("Dentro do loop enquanto");
+    /*
+    Comentario de bloco teste
+    */
+fimenquanto // atomo propositalmente em caixa baixa para teste
+
+imprime("Resultado final: ", resultado);
+
+FIMPROGRAMA // atomo propositalmente em caixa alta para teste

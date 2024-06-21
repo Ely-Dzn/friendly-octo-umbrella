@@ -35,9 +35,6 @@ class Main:
             print(f"Não foi possível ler o arquivo {self.file_path}")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Erro. O uso deve ser feito assim: python main.py <nome_do_arquivo_sem_extensao>")
-    else:
-        file_name = sys.argv[1]
-        main = Main(file_name)
-        main.run()
+    file_name = input("Digite o nome do arquivo fonte: ")
+    main = Main(file_name)
+    main.run()
